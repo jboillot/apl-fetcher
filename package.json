@@ -10,7 +10,11 @@
     "start": "node dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": {
+    "name": "Jérôme Boillot",
+    "email": "me@jerome-boillot.com",
+    "url": "https://jerome-boillot.com/"
+  },
   "license": "ISC",
   "dependencies": {
     "playwright-chromium": "^1.23.4"
