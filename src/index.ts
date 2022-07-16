@@ -3,7 +3,7 @@ import * as playwright from 'playwright-chromium';
 const HOME_PAGE = 'https://wwwd.caf.fr/wps/portal/caffr/aidesetservices/lesservicesenligne/estimervosdroits/lelogement';
 
 interface Props {
-    zipCode?: string;
+    codePostal?: string;
     loyerMensuel?: string;
     salaire?: string;
 }
@@ -20,57 +20,62 @@ const run = async (props: Props) => {
     await page.goto(HOME_PAGE);
 
     // Click on 'Commencer'
-    await page.waitForSelector('button[id="btn-commencer"]');
-    await page.click('button[id="btn-commencer"]');
+    const commencerButton = await page.waitForSelector('button[id="btn-commencer"]');
+    await commencerButton.click();
 
     // ZIP code
-    await page.waitForSelector('input[id="codePostal"]');
-    await page.fill('input[id="codePostal"]', props.zipCode || '75009');
+    const codePostalInput = await page.waitForSelector('input[id="codePostal"]');
+    await codePostalInput.fill(props.codePostal || '75009');
 
     // Select first match
     await page.waitForSelector('li[class="uib-typeahead-match"]');
     await page.keyboard.press('Enter');
 
     // Type
-    await page.waitForSelector('label[for="nature_APPARTEMENT_OU_MAISON"]');
-    await page.click('label[for="nature_APPARTEMENT_OU_MAISON"]');
+    const appartementOuMaisonButton = await page.waitForSelector('label[for="nature_APPARTEMENT_OU_MAISON"]');
+    await appartementOuMaisonButton.click();
 
     // Type
-    await page.waitForSelector('label[for="statut_LOCATION"]');
-    await page.click('label[for="statut_LOCATION"]')
+    const locationButton = await page.waitForSelector('label[for="statut_LOCATION"]');
+    await locationButton.click();
 
     // Meublé
-    await page.waitForSelector('label[for="estMeuble_true"]');
-    await page.click('label[for="estMeuble_true"]');
+    const meubleButton = await page.waitForSelector('label[for="estMeuble_true"]');
+    await meubleButton.click();
 
     // Loyer mensuel (avec charge)
-    await page.waitForSelector('input[name="montantLoyer"]');
-    await page.fill('input[name="montantLoyer"]', props.loyerMensuel || '1190');
+    const loyerMensuelInput = await page.waitForSelector('input[name="montantLoyer"]');
+    await loyerMensuelInput.fill(props.loyerMensuel || '1190');
 
     // Situation familiale
-    await page.waitForSelector('label[for="situationFamiliale_SEUL"]');
-    await page.click('label[for="situationFamiliale_SEUL"]');
+    const seulButton = await page.waitForSelector('label[for="situationFamiliale_SEUL"]');
+    await seulButton.click();
 
     // Nombre d'enfants
 
     // Revenus
-    await page.waitForSelector('button[id="allocataire_siSalaire"]');
-    await page.click('button[id="allocataire_siSalaire"]');
+    const salaireButton = await page.waitForSelector('button[id="allocataire_siSalaire"]');
+    await salaireButton.click();
 
-    await page.waitForSelector('input[id="ressourceallocataire_SALAIRE"]');
-    await page.fill('input[id="ressourceallocataire_SALAIRE"]', props.salaire || '2000');
+    const salaireInput = await page.waitForSelector('input[id="ressourceallocataire_SALAIRE"]');
+    await salaireInput.fill(props.salaire || '2000');
 
-    await page.waitForSelector('label[for="aucunRevenuETUDIANT_NON_BOURSIER"]');
-    await page.click('label[for="aucunRevenuETUDIANT_NON_BOURSIER"]');
+    const nonBoursierButton = await page.waitForSelector('label[for="aucunRevenuETUDIANT_NON_BOURSIER"]');
+    await nonBoursierButton.click();
 
     // Continuer
-    await page.waitForSelector('button[id="btn-suivant"]');
-    await page.click('button[id="btn-suivant"]');
+    const continuerButton = await page.waitForSelector('button[id="btn-suivant"]');
+    await continuerButton.click();
 
     // Récupérer le montant
     await page.waitForSelector('div[class="row mise-en-avant-fond-cnaf"]');
     const element = await page.locator('text=/\\d+€ par mois/');
     console.log(parseInt(await element.textContent() || '', 10));
+
+    await browser.close();
 };
 
-run({}).catch((err) => console.error(err));
+run({}).catch((err) => {
+    console.error(err);
+    process.exit(1);
+});
